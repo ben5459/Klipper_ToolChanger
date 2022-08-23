@@ -38,7 +38,7 @@ class ToolLock:
             desc = getattr(self, 'cmd_' + cmd + '_help', None)
             self.gcode.register_command(cmd, func, False, desc)
 
-        self.printer.register_event_handler("klippy:ready", self.Initialize_Tool_Lock)
+#        self.printer.register_event_handler("klippy:ready", self.Initialize_Tool_Lock)
         
     cmd_TOOL_LOCK_help = "Lock the ToolLock."
     def cmd_TOOL_LOCK(self, gcmd = None):
