@@ -15,7 +15,7 @@ class ToolLock:
 
         self.global_offset = [0, 0, 0]    # Global offset to apply to all tools
         self.saved_fan_speed = 0          # Saved partcooling fan speed when deselecting a tool with a fan.
-        self.tool_current = "-2"          # -2 Unknown tool locked, -1 No tool locked, 0 and up are tools.
+        self.tool_current = "-1"          # -2 Unknown tool locked, -1 No tool locked, 0 and up are tools.
         self.init_printer_to_last_tool = config.getboolean(
             'init_printer_to_last_tool', True)
         self.purge_on_toolchange = config.getboolean(
