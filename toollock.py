@@ -6,7 +6,7 @@
 import logging
 
 
-class ToolLock:
+class ATC:
     def __init__(self, config):
         self.printer = config.get_printer()
         self.reactor = self.printer.get_reactor()
@@ -24,12 +24,12 @@ class ToolLock:
         self.restore_position_on_toolchange = 0   # 0: Don't restore; 1: Restore XY; 2: Restore XYZ
 
         # G-Code macros
-        self.tool_lock_gcode_template = gcode_macro.load_template(config, 'tool_lock_gcode', '')
-        self.tool_unlock_gcode_template = gcode_macro.load_template(config, 'tool_unlock_gcode', '')
+        self.atc_lock_gcode_template = gcode_macro.load_template(config, 'atc_lock_gcode', '')
+        self.atc_unlock_gcode_template = gcode_macro.load_template(config, 'atc_unlock_gcode', '')
 
         # Register commands
         handlers = [
-            'SAVE_CURRENT_TOOL', 'TOOL_LOCK', 'TOOL_UNLOCK',
+            'SAVE_CURRENT_TOOL', 'ATC_LOCK', 'ATC_UNLOCK',
             'T_1', 'SET_AND_SAVE_FAN_SPEED', 'TEMPERATURE_WAIT_WITH_TOLERANCE', 
             'SET_TOOL_TEMPERATURE', 'SET_GLOBAL_OFFSET', 'SET_TOOL_OFFSET',
             'SET_PURGE_ON_TOOLCHANGE', 'SAVE_POSITION', 'RESTORE_POSITION']
@@ -38,18 +38,18 @@ class ToolLock:
             desc = getattr(self, 'cmd_' + cmd + '_help', None)
             self.gcode.register_command(cmd, func, False, desc)
 
-        self.printer.register_event_handler("klippy:ready", self.Initialize_Tool_Lock)
+        self.printer.register_event_handler("klippy:ready", self.Initialize_atc_Lock)
         
-    cmd_TOOL_LOCK_help = "Lock the ToolLock."
-    def cmd_TOOL_LOCK(self, gcmd = None):
-        self.ToolLock()
+    cmd_ATC_LOCK_help = "Lock the ATC."
+    def cmd_ATC_LOCK(self, gcmd = None):
+        self.ATC()
 
-    def ToolLock(self, ignore_locked = False):
-        self.gcode.respond_info("TOOL_LOCK running. ")
+    def ATC(self, ignore_locked = False):
+        self.gcode.respond_info("ATC_LOCK running. ")
         if not ignore_locked and int(self.tool_current) != -1:
-            self.gcode.respond_info("TOOL_LOCK is already locked with tool " + self.tool_current + ".")
+            self.gcode.respond_info("ATC_LOCK is already locked with tool " + self.tool_current + ".")
         else:
-            self.tool_lock_gcode_template.run_gcode_from_command()
+            self.atc_lock_gcode_template.run_gcode_from_command()
             self.SaveCurrentTool("-2")
             self.gcode.respond_info("Locked")
 
@@ -61,12 +61,12 @@ class ToolLock:
         if self.tool_current != "-1":
             self.printer.lookup_object('tool ' + str(self.tool_current)).Dropoff()
 
-    cmd_TOOL_UNLOCK_help = "Unlock the ToolLock."
-    def cmd_TOOL_UNLOCK(self, gcmd = None):
-        self.gcode.respond_info("TOOL_UNLOCK running. ")
-        self.tool_unlock_gcode_template.run_gcode_from_command()
+    cmd_ATC_UNLOCK_help = "Unlock the ATC."
+    def cmd_ATC_UNLOCK(self, gcmd = None):
+        self.gcode.respond_info("ATC_UNLOCK running.")
+        self.atc_unlock_gcode_template.run_gcode_from_command()
         self.SaveCurrentTool(-1)
-        self.gcode.run_script_from_command("M117 ToolLock Unlocked.")
+        self.gcode.run_script_from_command("M117 ATC Unlocked.")
 
 
     def PrinterIsHomedForToolchange(self, lazy_home_when_parking =0):
@@ -103,7 +103,7 @@ class ToolLock:
         if not self.init_printer_to_last_tool:
             return None
 
-        self.gcode.respond_info("Initialize_Tool_Lock running.")
+        self.gcode.respond_info("Initialize_ATC_Lock running.")
         save_variables = self.printer.lookup_object('save_variables')
         try:
             self.tool_current = save_variables.allVariables["tool_current"]
@@ -113,14 +113,14 @@ class ToolLock:
                 "SAVE_VARIABLE", "SAVE_VARIABLE", {"VARIABLE": "tool_current", 'VALUE': self.tool_current }))
 
         if str(self.tool_current) == "-1":
-            self.cmd_TOOL_UNLOCK()
-            self.gcode.run_script_from_command("M117 ToolLock initialized unlocked")
+            self.cmd_ATC_UNLOCK()
+            self.gcode.run_script_from_command("M117 ATC initialized unlocked")
 
         else:
             t = self.tool_current
-            self.ToolLock(True)
+            self.ATC(True)
             self.SaveCurrentTool(str(t))
-            self.gcode.run_script_from_command("M117 ToolLock initialized with T%s." % self.tool_current) 
+            self.gcode.run_script_from_command("M117 ATC initialized with T%s." % self.tool_current) 
 
     cmd_SET_AND_SAVE_FAN_SPEED_help = "Save the fan speed to be recovered at ToolChange."
     def cmd_SET_AND_SAVE_FAN_SPEED(self, gcmd):
@@ -132,7 +132,7 @@ class ToolLock:
             self.gcode.respond_info("cmd_SET_AND_SAVE_FAN_SPEED: Invalid tool:"+str(tool_id))
             return None
 
-        self.gcode.respond_info("ToolLock.cmd_SET_AND_SAVE_FAN_SPEED: Change fan speed for T%s to %f." % (str(tool_id), fanspeed))
+        self.gcode.respond_info("ATC.cmd_SET_AND_SAVE_FAN_SPEED: Change fan speed for T%s to %f." % (str(tool_id), fanspeed))
 
         # If value is >1 asume it is given in 0-255 and convert to percentage.
         if fanspeed > 1:
@@ -149,7 +149,7 @@ class ToolLock:
         tool = self.printer.lookup_object("tool " + str(tool_id))
 
         if tool.fan is None:
-            self.gcode.respond_info("ToolLock.SetAndSaveFanSpeed: Tool %s has no fan." % str(tool_id))
+            self.gcode.respond_info("ATC.SetAndSaveFanSpeed: Tool %s has no fan." % str(tool_id))
         else:
             self.SaveFanSpeed(fanspeed)
             self.gcode.run_script_from_command(
@@ -377,4 +377,4 @@ class ToolLock:
         return status
 
 def load_config(config):
-    return ToolLock(config)
+    return ATC(config)
