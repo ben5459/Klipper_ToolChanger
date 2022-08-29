@@ -99,7 +99,7 @@ class ATC:
         if t is not None:
             self.SaveCurrentTool(t)
 
-    def Initialize_Tool_Lock(self):
+    def Initialize_ATC_Lock(self):
         if not self.init_printer_to_last_tool:
             return None
 
