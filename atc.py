@@ -38,7 +38,7 @@ class ATC:
             desc = getattr(self, 'cmd_' + cmd + '_help', None)
             self.gcode.register_command(cmd, func, False, desc)
 
-        self.printer.register_event_handler("klippy:ready", self.Initialize_atc_Lock)
+        self.printer.register_event_handler("klippy:ready", self.Initialize_ATC_Lock)
         
     cmd_ATC_LOCK_help = "Lock the ATC."
     def cmd_ATC_LOCK(self, gcmd = None):
