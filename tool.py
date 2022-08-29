@@ -49,7 +49,7 @@ class Tool:
         self.printer = config.get_printer()
         self.gcode = config.get_printer().lookup_object('gcode')
         gcode_macro = self.printer.load_object(config, 'gcode_macro')
-        self.toollock = self.printer.lookup_object('toollock')
+        self.atc = self.printer.lookup_object('atc')
 
         ##### Name #####
         self.name = config.get_name().split()[-1]
@@ -166,7 +166,7 @@ class Tool:
 
     cmd_SelectTool_help = "Select Tool"
     def cmd_SelectTool(self, gcmd):
-        current_tool_id = int(self.toollock.get_status()['tool_current']) # int(self.toollock.get_tool_current())
+        current_tool_id = int(self.atc.get_status()['tool_current']) # int(self.atc.get_tool_current())
 
         self.gcode.respond_info("T" + str(self.name) + " Selected.")
         self.gcode.respond_info("Current Tool is T" + str(current_tool_id) + ".")
@@ -186,10 +186,10 @@ class Tool:
         param = gcmd.get('RESTORE_POSITION', 0)
         param = int(str(param)[-1])
 
-        self.toollock.Set_restore_position_on_toolchange(param)
+        self.atc.Set_restore_position_on_toolchange(param)
         self.gcode.respond_info("RESTORE_POSITION: " + str(param))
         if param != 0:
-            self.toollock.SavePosition()
+            self.atc.SavePosition()
             self.gcode.respond_info("RESTORE_POSITION: saved")
 
         # Drop any tools already mounted.
@@ -233,11 +233,11 @@ class Tool:
                 # To be implemented
 
         self.gcode.run_script_from_command("M117 T%d Loaded" % (int(self.name)))
-        self.toollock.SaveCurrentTool(self.name)
+        self.atc.SaveCurrentTool(self.name)
 
     def Pickup(self):
         # Check if homed
-        if not self.toollock.PrinterIsHomedForToolchange():
+        if not self.atc.PrinterIsHomedForToolchange():
             raise self.printer.command_error("Tool.Pickup: Printer not homed and Lazy homing option is: " + self.lazy_home_when_parking)
             return None
 
@@ -251,7 +251,7 @@ class Tool:
         try:
             context = self.pickup_gcode_template.create_template_context()
             context['myself'] = self.get_status()
-            context['toollock'] = self.toollock.get_status()
+            context['atc'] = self.atc.get_status()
 #            self.gcode.respond_info(self.pickup_gcode_template.render(context))
             self.pickup_gcode_template.run_gcode_from_command(context)
         except Exception:
@@ -260,7 +260,7 @@ class Tool:
         # Restore fan if has a fan.
         if self.fan is not None:
             self.gcode.run_script_from_command(
-                "SET_FAN_SPEED FAN=" + self.fan + " SPEED=" + str(self.toollock.get_status()['saved_fan_speed'])) #  self.toollock.get_saved_fan_speed()) )
+                "SET_FAN_SPEED FAN=" + self.fan + " SPEED=" + str(self.atc.get_status()['saved_fan_speed'])) #  self.atc.get_saved_fan_speed()) )
 
         # Set Tool specific input shaper.
         if self.shaper_freq_x != 0 or self.shaper_freq_y != 0:
@@ -275,12 +275,12 @@ class Tool:
             self.gcode.run_script_from_command(cmd)
 
         # Save current picked up tool and print on screen.
-        self.toollock.SaveCurrentTool(self.name)
+        self.atc.SaveCurrentTool(self.name)
         self.gcode.run_script_from_command("M117 T%d picked up." % (self.name))
 
     def Dropoff(self):
         # Check if homed
-        if not self.toollock.PrinterIsHomedForToolchange():
+        if not self.atc.PrinterIsHomedForToolchange():
             self.gcode.respond_info("Tool.Dropoff: Printer not homed and Lazy homing option is: " + str(self.lazy_home_when_parking))
             return None
 
@@ -293,16 +293,16 @@ class Tool:
         try:
             context = self.dropoff_gcode_template.create_template_context()
             context['myself'] = self.get_status()
-            context['toollock'] = self.toollock.get_status()
+            context['atc'] = self.atc.get_status()
             self.dropoff_gcode_template.run_gcode_from_command(context)
         except Exception:
             logging.exception("Dropoff gcode: Script running error")
 
-        self.toollock.SaveCurrentTool(-1)   # Dropoff successfull
+        self.atc.SaveCurrentTool(-1)   # Dropoff successfull
 
     def LoadVirtual(self):
         self.gcode.respond_info("LoadVirtual: Virtual tools not implemented yet. T%d." % self.name )
-        self.toollock.SaveCurrentTool(self.name)
+        self.atc.SaveCurrentTool(self.name)
 
     def UnloadVirtual(self):
         self.gcode.respond_info("UnloadVirtual: Virtual tools not implemented yet. T%d." % self.name )
