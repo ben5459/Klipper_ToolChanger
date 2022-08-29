@@ -1,9 +1,7 @@
-# Tools for klipper
+# Tool Changer Code for klipper
 
 This are python extras, macros and example config for the
-[Klipper 3D printer firmware](https://github.com/Klipper3d/klipper). I
-originally created this as macros when converting my Jubilee based
-toolchanger from RRF and Duet3 to Klipper.
+[Klipper 3D printer firmware](https://github.com/Klipper3d/klipper). 
 
 I welcome all contribution!
 
@@ -93,8 +91,8 @@ Then restart Klipper to pick up the extensions.
 * `[input_shaper]` needs to be used for input shaper to wordk.
 
 ## G-Code commands:
-* `TOOL_LOCK` - Lock command
-* `TOOL_UNLOCK` - Unlock command
+* `ATC_LOCK` - Lock command
+* `ATC_UNLOCK` - Unlock command
 * `Tn` - T0, T1, T2, etc... A select command is created for each tool. 
   * `RESTORE_POSITION` - Optional that will save position and type of restore, Defaults to 0, do not restore, 1will restore XY and 2 will restore XYZ withe the `RESTORE_POSITION` command.
 * `T_1` - Dropoff the current tool without picking up another tool
@@ -126,7 +124,7 @@ This command can be used without any additional parameters. Without parameters i
 * `SAVE_POSITION` - Save the current G-Code position of the toolhead.
 * `RESTORE_POSITION` - Restore position to the latest saved position. RESTORE_POSITION parameter as in Tn.
 ## Values accesible from Macro for each object
-- **Toollock**
+- **ATC**
   - `global_offset` - Global offset.
   - `tool_current` - -2: Unknown tool locked, -1: No tool locked, 0: and up are toolnames.
   - `saved_fan_speed` - Speed saved at each fanspeedchange to be recovered at Toolchange.
