@@ -88,7 +88,7 @@ Then restart Klipper to pick up the extensions.
 * Save pressure avance per tool to be restored on toolchange. Also between virtual tools. Check Slicer output first if this is needed or can be put in Filament custom gcode.
 
 ## Configuration requirements
-* `[input_shaper]` needs to be used for input shaper to wordk.
+* `[input_shaper]` needs to be used for input shaper to work.
 
 ## G-Code commands:
 * `ATC_LOCK` - Lock command
