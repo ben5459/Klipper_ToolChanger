@@ -21,7 +21,7 @@ class ATC:
         self.purge_on_toolchange = config.getboolean(
             'purge_on_toolchange', True)
         self.saved_position = None
-        self.restore_position_on_toolchange = 0   # 0: Don't restore; 1: Restore XY; 2: Restore XYZ
+        self.restore_position_on_toolchange = 2   # 0: Don't restore; 1: Restore XY; 2: Restore XYZ
 
         # G-Code macros
         self.atc_lock_gcode_template = gcode_macro.load_template(config, 'atc_lock_gcode', '')
