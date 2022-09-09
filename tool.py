@@ -183,7 +183,7 @@ class Tool:
             #pass
 
         # Check if we have a passed GCODE parameter for Restore Position, if not then set it to false.
-        param = gcmd.get('RESTORE_POSITION', 0)
+        param = gcmd.get('RESTORE_POSITION', 2)
         param = int(str(param)[-1])
 
         self.atc.Set_restore_position_on_toolchange(param)
