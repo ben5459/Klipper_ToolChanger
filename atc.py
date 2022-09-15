@@ -50,7 +50,7 @@ class ATC:
             self.gcode.respond_info("ATC_LOCK is already locked with tool " + self.tool_current + ".")
         else:
             self.atc_lock_gcode_template.run_gcode_from_command()
-            self.SaveCurrentTool("-2")
+            #self.SaveCurrentTool("-2")
             self.gcode.respond_info("Locked")
 
     cmd_T_1_help = "Deselect all tools"
@@ -65,7 +65,7 @@ class ATC:
     def cmd_ATC_UNLOCK(self, gcmd = None):
         self.gcode.respond_info("ATC_UNLOCK running.")
         self.atc_unlock_gcode_template.run_gcode_from_command()
-        self.SaveCurrentTool(-1)
+        #self.SaveCurrentTool(-1)
         self.gcode.run_script_from_command("M117 ATC Unlocked.")
 
 
