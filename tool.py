@@ -11,7 +11,7 @@ class Tool:
         self.name = None
         self.toolgroup = None               # defaults to 0. Check if tooltype is defined.
         self.is_virtual = None
-        self.physical_parent_id = None      # Parent tool is used as a Physical parent for all tools of this group. Only used if the tool i virtual. None gets remaped to -1.
+        self.physical_parent_id = None      # Parent tool is used as a Physical parent for all tools of this group. Only used if the tool is virtual. None gets remaped to -1.
         self.extruder = None                # Name of extruder connected to this tool. Defaults to None.
         self.fan = None                     # Name of general fan configuration connected to this tool as a part fan. Defaults to "none".
         self.meltzonelength = None          # Length of the meltzone for retracting and inserting filament on toolchange. 18mm for e3d Revo
