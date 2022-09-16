@@ -206,7 +206,7 @@ class Tool:
                         ):
                 self.gcode.respond_info("Will Dropoff():")
                 current_tool.Dropoff()
-                current_tool_id = -1
+                #current_tool_id = -1
 
         # Now we asume tool has been dropped if needed be.
 
