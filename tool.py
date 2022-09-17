@@ -246,7 +246,10 @@ class Tool:
             self.gcode.run_script_from_command(
                 "ACTIVATE_EXTRUDER extruder=%s" % 
                 (self.extruder))
-
+            
+        # Save current picked up tool 
+        self.atc.SaveCurrentTool(self.name)
+        
         # Run the gcode for pickup.
         try:
             context = self.pickup_gcode_template.create_template_context()
@@ -275,7 +278,7 @@ class Tool:
             self.gcode.run_script_from_command(cmd)
 
         # Save current picked up tool and print on screen.
-        self.atc.SaveCurrentTool(self.name)
+        #self.atc.SaveCurrentTool(self.name)
         self.gcode.run_script_from_command("M117 T%d picked up." % (self.name))
 
     def Dropoff(self):
@@ -298,7 +301,7 @@ class Tool:
         except Exception:
             logging.exception("Dropoff gcode: Script running error")
 
-        self.atc.SaveCurrentTool(-1)   # Dropoff successfull
+        #self.atc.SaveCurrentTool(-1)   # Dropoff successfull
 
     def LoadVirtual(self):
         self.gcode.respond_info("LoadVirtual: Virtual tools not implemented yet. T%d." % self.name )
