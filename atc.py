@@ -328,35 +328,78 @@ class ATC:
     def Set_restore_position_on_toolchange(self, value):
         self.restore_position_on_toolchange = value
 
-    cmd_SAVE_POSITION_help = "Save the current G-Code position."
+    cmd_SAVE_POSITION_help = "Save the specified G-Code position."
+#  Sets the Restore type and saves specified position.
+#   With no parameters it will set Restore type to 0, no restore.
+#   With X and Y parameters it will save the specified X and Y. Sets restore type to 1, restore XY.
+#   With X, Y and Z parameters it will save the specified X, Y and Z. Sets restore type to 2, restore XYZ.
+#  X= X position to save, optional but Y must be specifie or this will be ignored.
+#  Y= Y position to save, optional but X must be specifie or this will be ignored.
+#  Z= Z position to save, optional but X and Y must be specifie or this will be ignored.
     def cmd_SAVE_POSITION(self, gcmd):
-        self.SavePosition()
+        param_X = gcmd.get_float('X', None)
+        param_Y = gcmd.get_float('Y', None)
+        param_Z = gcmd.get_float('Z', None)
+        self.SavePosition(param_X, param_Y, param_Z)
 
-    def SavePosition(self):
+    def SavePosition(self, param_X = None, param_Y = None, param_Z = None):
+        if param_X is None or param_Y is None:
+            self.restore_position_on_toolchange_type = 0
+            return
+        elif param_Z is None:
+            self.restore_position_on_toolchange_type = 1
+        else:
+            self.restore_position_on_toolchange_type = 2
+
+        self.saved_position = [param_X, param_Y, param_Z]
+
+
+    cmd_SAVE_CURRENT_POSITION_help = "Save the current G-Code position."
+#  Saves current position. 
+#  RESTORE_POSITION_TYPE= Type of restore, optional. If not specified, restore_position_on_toolchange_type will not be changed.
+#    0: No restore
+#    1: Restore XY
+#    2: Restore XYZ
+    def cmd_SAVE_CURRENT_POSITION(self, gcmd):
+        # Save optional RESTORE_POSITION_TYPE parameter to restore_position_on_toolchange_type variable.
+        param = gcmd.get_int('RESTORE_POSITION_TYPE', None, minval=0, maxval=2)
+        self.SaveCurrentPosition(param)
+
+    def SaveCurrentPosition(self, restore_position_type = None):
+        if restore_position_type is not None:
+            if restore_position_type in [ 0, 1, 2 ]:
+                self.restore_position_on_toolchange_type = param
+        
         gcode_move = self.printer.lookup_object('gcode_move')
         self.saved_position = gcode_move._get_gcode_position()
 
     cmd_RESTORE_POSITION_help = "Restore a previously saved G-Code position if it was specified in the toolchange T# command."
+#  Restores the previously saved possition according to 
+#   With no parameters it will Restore to previousley saved type.
+#  RESTORE_POSITION_TYPE= Type of restore, optional. If not specified, previousley saved restore_position_on_toolchange_type will be used.
+#    0: No restore
+#    1: Restore XY
+#    2: Restore XYZ
     def cmd_RESTORE_POSITION(self, gcmd):
-        self.gcode.respond_info("cmd_RESTORE_POSITION running: " + str(self.restore_position_on_toolchange))
+        self.gcode.respond_info("cmd_RESTORE_POSITION running: " + str(self.restore_position_on_toolchange_type))
 
-        param = gcmd.get_int('RESTORE_POSITION', None, minval=0, maxval=2)
+        param = gcmd.get_int('RESTORE_POSITION_TYPE', None, minval=0, maxval=2)
 
         if param is not None:
             if param == 0 or param == 1 or param == 2:
-                self.restore_position_on_toolchange = param
+                self.restore_position_on_toolchange_type = param
 
-        if self.restore_position_on_toolchange == 0:
+        if self.restore_position_on_toolchange_type == 0:
             return
 
         if self.saved_position is None:
-            raise gcmd.error("No saved g-code position.")
+            raise gcmd.error("No previously saved g-code position.")
 
         try:
             p = self.saved_position
-            if self.restore_position_on_toolchange == 1:
+            if self.restore_position_on_toolchange_type == 1:
                 v=str("G1 X%.3f Y%.3f" % (p[0], p[1]))
-            elif self.restore_position_on_toolchange == 2:
+            elif self.restore_position_on_toolchang_typee == 2:
                 v=str("G1 X%.3f Y%.3f Z%.3f" % (p[0], p[1], p[2]))
             # Restore position
             self.gcode.respond_info("cmd_RESTORE_POSITION running: " + v)
@@ -364,7 +407,7 @@ class ATC:
         except:
             raise gcmd.error("Could not restore position.")
 
-
+            
     def get_status(self, eventtime= None):
         status = {
             "global_offset": self.global_offset,
