@@ -254,10 +254,7 @@ class Tool:
             self.pickup_gcode_template.run_gcode_from_command(context)
         except Exception:
             logging.exception("Pickup gcode: Script running error")
-    
-        # Save current picked up tool 
-        self.atc.SaveCurrentTool(self.name)
-        
+         
         # Restore fan if has a fan.
         if self.fan is not None:
             self.gcode.run_script_from_command(
@@ -276,7 +273,7 @@ class Tool:
             self.gcode.run_script_from_command(cmd)
 
         # Save current picked up tool and print on screen.
-        #self.atc.SaveCurrentTool(self.name)
+        self.atc.SaveCurrentTool(self.name)
         self.gcode.run_script_from_command("M117 T%d picked up." % (self.name))
 
     def Dropoff(self):
