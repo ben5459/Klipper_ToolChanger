@@ -244,20 +244,20 @@ class Tool:
             self.gcode.run_script_from_command(
                 "ACTIVATE_EXTRUDER extruder=%s" % 
                 (self.extruder))
-            
-        # Save current picked up tool 
-        self.atc.SaveCurrentTool(self.name)
-        
+           
         # Run the gcode for pickup.
         try:
             context = self.pickup_gcode_template.create_template_context()
             context['myself'] = self.get_status()
-#            context['atc'] = self.atc.get_status()
+            context['atc'] = self.atc.get_status()
 #            self.gcode.respond_info(self.pickup_gcode_template.render(context))
             self.pickup_gcode_template.run_gcode_from_command(context)
         except Exception:
             logging.exception("Pickup gcode: Script running error")
-
+    
+        # Save current picked up tool 
+        self.atc.SaveCurrentTool(self.name)
+        
         # Restore fan if has a fan.
         if self.fan is not None:
             self.gcode.run_script_from_command(
