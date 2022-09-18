@@ -45,17 +45,18 @@ class ATC:
         self.ATC()
 
     def ATC(self, ignore_locked = False):
-        self.gcode.respond_info("ATC_LOCK running. ")
-        if not ignore_locked and int(self.tool_current) != -1:
+        self.gcode.respond_info("ATC_LOCK running.")
+        if not ignore_locked and #int(self.tool_current) != -1:
             self.gcode.respond_info("ATC_LOCK is already locked with tool " + self.tool_current + ".")
         else:
             self.atc_lock_gcode_template.run_gcode_from_command()
             #self.SaveCurrentTool("-2")
-            self.gcode.respond_info("Locked")
+            self.toollock.SaveCurrentTool(self.name)
+            self.gcode.respond_info("Lockedwith tool" + self.tool_current + ".")
 
     cmd_T_1_help = "Deselect all tools"
     def cmd_T_1(self, gcmd = None):
-        self.gcode.respond_info("T_1 running. ")# + gcmd.get_raw_command_parameters())
+        self.gcode.respond_info("T_1 running.")# + gcmd.get_raw_command_parameters())
         if self.tool_current == "-2":
             raise self.printer.command_error("cmd_T_1: Unknown tool already mounted Can't park unknown tool.")
         if self.tool_current != "-1":
