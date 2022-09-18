@@ -46,8 +46,8 @@ class ATC:
 
     def ATC(self, ignore_locked = False):
         self.gcode.respond_info("ATC_LOCK running.")
-        if not ignore_locked 
-        #and int(self.tool_current) != -1:
+        if not ignore_locked and int(self.tool_current) < 0:
+        #!= -1:
             self.gcode.respond_info("ATC_LOCK is already locked with tool " + self.tool_current + ".")
         else:
             self.atc_lock_gcode_template.run_gcode_from_command()
