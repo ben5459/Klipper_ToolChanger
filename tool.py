@@ -252,7 +252,7 @@ class Tool:
         try:
             context = self.pickup_gcode_template.create_template_context()
             context['myself'] = self.get_status()
-            context['atc'] = self.atc.get_status()
+#            context['atc'] = self.atc.get_status()
 #            self.gcode.respond_info(self.pickup_gcode_template.render(context))
             self.pickup_gcode_template.run_gcode_from_command(context)
         except Exception:
