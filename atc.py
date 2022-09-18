@@ -32,7 +32,7 @@ class ATC:
             'SAVE_CURRENT_TOOL', 'ATC_LOCK', 'ATC_UNLOCK',
             'T_1', 'SET_AND_SAVE_FAN_SPEED', 'TEMPERATURE_WAIT_WITH_TOLERANCE', 
             'SET_TOOL_TEMPERATURE', 'SET_GLOBAL_OFFSET', 'SET_TOOL_OFFSET',
-            'SET_PURGE_ON_TOOLCHANGE', 'SAVE_POSITION', 'RESTORE_POSITION']
+            'SET_PURGE_ON_TOOLCHANGE', 'SAVE_POSITION', 'SAVE_CURRENT_POSITION', 'RESTORE_POSITION']
         for cmd in handlers:
             func = getattr(self, 'cmd_' + cmd)
             desc = getattr(self, 'cmd_' + cmd + '_help', None)
