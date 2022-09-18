@@ -182,15 +182,13 @@ class Tool:
             self.gcode.run_script_from_command("M568 P%d A2" % (int(self.name)))
             #pass
 
-        # Check if we have a passed GCODE parameter for Restore Position, if not then set it to false.
-        param = gcmd.get('RESTORE_POSITION', 2)
-        param = int(str(param)[-1])
-
-        self.atc.Set_restore_position_on_toolchange(param)
-        self.gcode.respond_info("RESTORE_POSITION: " + str(param))
-        if param != 0:
-            self.atc.SavePosition()
-            self.gcode.respond_info("RESTORE_POSITION: saved")
+        # If optional RESTORE_POSITION_TYPE parameter is passed as 1 or 2 then save current position and restore_position_on_toolchange_type as passed. Otherwise do not change either the restore_position_on_toolchange_type or saved_position. This makes it possible to call SAVE_POSITION or SAVE_CURRENT_POSITION before the actual T command.
+        param = gcmd.get_int('RESTORE_POSITION_TYPE', None, minval=0, maxval=2)
+        if param is not None:
+            if restore_position_type in [ 1, 2 ]:
+                self.toollock.SaveCurrentPosition(param) # Sets restore_position_on_toolchange_type to 1 or 2 and saves current position
+            else:
+                self.toollock.SavePosition()  # Sets restore_position_on_toolchange_type to 0
 
         # Drop any tools already mounted.
         if current_tool_id >= 0:                    # If there is a current tool already selected and it's a dropable.
