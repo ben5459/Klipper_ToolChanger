@@ -51,7 +51,7 @@ class Tool:
         self.atc = self.printer.lookup_object('atc')
 
         ##### Name #####
-               try:
+        try:
             _, name = config.get_name().split(" ", 1)
             self.name = int(name)
         except ValueError:
