@@ -10,7 +10,7 @@ class ToolGroup:
         self.printer = config.get_printer()
         gcode_macro = self.printer.load_object(config, 'gcode_macro')
 
-       try:
+        try:
             _, name = config.get_name().split(' ', 1)
             self.name = int(name)
         except ValueError:
