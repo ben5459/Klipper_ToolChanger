@@ -6,6 +6,7 @@
 # This file may be distributed under the terms of the GNU GPLv3 license.
 import logging
 import pins
+from . import manual_probe
 
 HINT_TIMEOUT = """
 If the probe did not move far enough to trigger, then
@@ -24,6 +25,12 @@ class PrinterProbeXY:
         self.mcu_probe = [mcu_probe_x, mcu_probe_y]
         self.speed = config.getfloat('speed', 5.0, above=0.)
         self.lift_speed = config.getfloat('lift_speed', self.speed, above=0.)
+        self.x_offset = config.getfloat('x_offset', 0.)
+        self.y_offset = config.getfloat('y_offset', 0.)
+        self.z_offset = config.getfloat('z_offset')
+        self.probe_calibrate_x = 0.
+        self.probe_calibrate_y = 0.
+        self.probe_calibrate_z = 0.
         self.last_state = False
         self.last_result = [0., 0., 0.]
         self.gcode_move = self.printer.load_object(config, "gcode_move")
