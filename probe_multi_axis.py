@@ -66,12 +66,12 @@ class PrinterProbeMultiAxis:
         # Register PROBE/QUERY_PROBE commands
         self.gcode = self.printer.lookup_object('gcode')
         self.gcode.register_command('PROBE_MULTI_AXIS', self.cmd_PROBE,
-                                    desc=self.cmd_PROBE_MULTI_AXIS_help)
+                                    desc=self.cmd_PROBE_help)
         self.gcode.register_command('QUERY_PROBE_MULTI_AXIS', self.cmd_QUERY_PROBE,
-                                    desc=self.cmd_QUERY_PROBE_MULTI_AXIS_help)
+                                    desc=self.cmd_QUERY_PROBE_help)
         self.gcode.register_command('PROBE_MULTI_AXIS_ACCURACY',
                                     self.cmd_PROBE_MULTI_AXIS_ACCURACY,
-                                    desc=self.cmd_PROBE_MULTI_AXIS_ACCURACY_help)
+                                    desc=self.cmd_PROBE_ACCURACY_help)
     #def _handle_homing_move_begin(self, hmove):
     #    if self.mcu_probe[0] in hmove.get_mcu_endstops():
     #        self.mcu_probe[0].probe_prepare(hmove)
