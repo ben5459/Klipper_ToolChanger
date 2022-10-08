@@ -181,7 +181,7 @@ class PrinterProbeMultiAxis:
         self.last_result = pos
         self._move(pos, self.get_lift_speed(gcmd))
     cmd_QUERY_PROBE_help = "Return the status of the xy-probe"
-    def cmd_QUERY_PROBE(self, gcmd):
+    def cmd_QUERY_MULTI_AXIS_PROBE(self, gcmd):
         toolhead = self.printer.lookup_object('toolhead')
         print_time = toolhead.get_last_move_time()
         res = self.mcu_probe[0].query_endstop(print_time)
@@ -191,7 +191,7 @@ class PrinterProbeMultiAxis:
         return {'last_query': self.last_state,
                 'last_result': self.last_result}
     cmd_PROBE_ACCURACY_help = "Probe Z-height accuracy at current XY position"
-    def cmd_PROBE_ACCURACY(self, gcmd):
+    def cmd_PROBE_MULTI_AXIS_ACCURACY(self, gcmd):
         speed = gcmd.get_float("PROBE_SPEED", self.speed, above=0.)
         direction = gcmd.get("DIRECTION")
         if direction not in direction_types:
@@ -293,4 +293,4 @@ class ProbeYEndstopWrapper:
 
 
 def load_config(config):
-    return PrinterProbe3D(config, ProbeXEndstopWrapper(config), ProbeYEndstopWrapper(config))
+    return PrinterProbeMultiAxis(config, ProbeXEndstopWrapper(config), ProbeYEndstopWrapper(config))
