@@ -16,7 +16,7 @@ position can be negative).
 direction_types = {'x+': [0,+1],'x-': [0,-1],'y+': [1,+1],'y-': [1,-1]}
 
 
-class PrinterProbe3D:
+class PrinterProbeMultiAxis:
     def __init__(self, config, mcu_probe_x, mcu_probe_y):
         self.printer = config.get_printer()
         self.name = config.get_name()
@@ -65,11 +65,11 @@ class PrinterProbe3D:
                                             self._handle_home_rails_end)
         # Register PROBE/QUERY_PROBE commands
         self.gcode = self.printer.lookup_object('gcode')
-        self.gcode.register_command('PROBE_3D', self.cmd_PROBE,
+        self.gcode.register_command('PROBE_MULTI_AXIS', self.cmd_PROBE,
                                     desc=self.cmd_PROBE_help)
-        self.gcode.register_command('QUERY_PROBE_3D', self.cmd_QUERY_PROBE,
+        self.gcode.register_command('QUERY_PROBE_MULTI_AXIS', self.cmd_QUERY_PROBE,
                                     desc=self.cmd_QUERY_PROBE_help)
-        self.gcode.register_command('PROBE_3D_ACCURACY',
+        self.gcode.register_command('PROBE_MULTI_AXIS_ACCURACY',
                                     self.cmd_PROBE_ACCURACY,
                                     desc=self.cmd_PROBE_ACCURACY_help)
     #def _handle_homing_move_begin(self, hmove):
@@ -293,4 +293,4 @@ class ProbeYEndstopWrapper:
 
 
 def load_config(config):
-    return PrinterProbe3D(config, ProbeXEndstopWrapper(config), ProbeYEndstopWrapper(config))
+    return PrinterProbeMultiAxis(config, ProbeXEndstopWrapper(config), ProbeYEndstopWrapper(config))
