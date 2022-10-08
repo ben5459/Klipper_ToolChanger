@@ -16,7 +16,7 @@ position can be negative).
 direction_types = {'x+': [0,+1],'x-': [0,-1],'y+': [1,+1],'y-': [1,-1]}
 
 
-class PrinterProbe3D:
+class PrinterProbeMultiAxis:
     def __init__(self, config, mcu_probe_x, mcu_probe_y):
         self.printer = config.get_printer()
         self.name = config.get_name()
@@ -53,7 +53,7 @@ class PrinterProbe3D:
         self.samples_retries = config.getint('samples_tolerance_retries', 0,
                                              minval=0)
         # Register xy_virtual_endstop pin
-        self.printer.lookup_object('pins').register_chip('probe_xy', self)
+        self.printer.lookup_object('pins').register_chip('probe_multi_axis', self)
         # Register homing event handlers
         #self.printer.register_event_handler("homing:homing_move_begin",
         #                                    self._handle_homing_move_begin)
@@ -65,13 +65,13 @@ class PrinterProbe3D:
                                             self._handle_home_rails_end)
         # Register PROBE/QUERY_PROBE commands
         self.gcode = self.printer.lookup_object('gcode')
-        self.gcode.register_command('PROBE_3D', self.cmd_PROBE,
-                                    desc=self.cmd_PROBE_help)
-        self.gcode.register_command('QUERY_PROBE_3D', self.cmd_QUERY_PROBE,
-                                    desc=self.cmd_QUERY_PROBE_help)
-        self.gcode.register_command('PROBE_3D_ACCURACY',
-                                    self.cmd_PROBE_ACCURACY,
-                                    desc=self.cmd_PROBE_ACCURACY_help)
+        self.gcode.register_command('PROBE_MULTI_AXIS', self.cmd_PROBE,
+                                    desc=self.cmd_PROBE_MULTI_AXIS_help)
+        self.gcode.register_command('QUERY_PROBE_MULTI_AXIS', self.cmd_QUERY_PROBE,
+                                    desc=self.cmd_QUERY_PROBE_MULTI_AXIS_help)
+        self.gcode.register_command('PROBE_MULTI_AXIS_ACCURACY',
+                                    self.cmd_PROBE_MULTI_AXIS_ACCURACY,
+                                    desc=self.cmd_PROBE_MULTI_AXIS_ACCURACY_help)
     #def _handle_homing_move_begin(self, hmove):
     #    if self.mcu_probe[0] in hmove.get_mcu_endstops():
     #        self.mcu_probe[0].probe_prepare(hmove)
