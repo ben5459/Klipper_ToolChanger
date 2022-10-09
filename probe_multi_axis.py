@@ -17,15 +17,15 @@ direction_types = {'x+': [0,+1],'x-': [0,-1],'y+': [1,+1],'y-': [1,-1],'z+': [2,
 
 
 class PrinterProbeMultiAxis:
-    def __init__(self, config, mcu_probe_x, mcu_probe_y):
+    def __init__(self, config, mcu_probe_x, mcu_probe_y, mcu_probe_z):
         self.printer = config.get_printer()
         self.name = config.get_name()
-        self.mcu_probe = [mcu_probe_x, mcu_probe_y]
+        self.mcu_probe = [mcu_probe_x, mcu_probe_y, mcu_probe_z]
         self.speed = config.getfloat('speed', 5.0, above=0.)
         self.lift_speed = config.getfloat('lift_speed', self.speed, above=0.)
         self.x_offset = config.getfloat('x_offset', 0.)
         self.y_offset = config.getfloat('y_offset', 0.)
-        self.z_offset = config.getfloat('z_offset')
+        self.z_offset = config.getfloat('z_offset', 0.)
         self.probe_calibrate_x = 0.
         self.probe_calibrate_y = 0.
         self.probe_calibrate_z = 0.
