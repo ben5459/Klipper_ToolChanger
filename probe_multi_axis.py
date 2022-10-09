@@ -23,6 +23,7 @@ class PrinterProbeMultiAxis:
         self.mcu_probe = [mcu_probe_x, mcu_probe_y, mcu_probe_z]
         self.speed = config.getfloat('speed', 5.0, above=0.)
         self.lift_speed = config.getfloat('lift_speed', self.speed, above=0.)
+        self.max_travel = config.getfloat("max_travel", 4, above=0)
         self.x_offset = config.getfloat('x_offset', 0.)
         self.y_offset = config.getfloat('y_offset', 0.)
         self.z_offset = config.getfloat('z_offset', 0.)
@@ -158,6 +159,14 @@ class PrinterProbeMultiAxis:
         samples_retries = gcmd.get_int("SAMPLES_TOLERANCE_RETRIES",
                                        self.samples_retries, minval=0)
         samples_result = gcmd.get("SAMPLES_RESULT", self.samples_result)
+        
+        adjust_max = max(z_adjust)
+        if adjust_max > self.max_adjust:
+            raise self.gcode.error("Aborting quad_gantry_level"
+                                   " required adjustment %0.6f"
+                                   " is greater than max_adjust %0.6f"
+                                   % (adjust_max, self.max_adjust))
+            
         probe_start = self.printer.lookup_object('toolhead').get_position()
         retries = 0
         positions = []
