@@ -31,6 +31,9 @@ class PrinterProbeMultiAxis:
         self.probe_calibrate_z = 0.
         self.last_state = False
         self.last_result = [0., 0., 0.]
+        self.last_x_result = 0.
+        self.last_y_result = 0.
+        self.last_z_result = 0.
         self.gcode_move = self.printer.load_object(config, "gcode_move")
 
         xconfig = config.getsection('stepper_x')
