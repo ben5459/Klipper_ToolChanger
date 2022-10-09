@@ -13,7 +13,7 @@ position so the probe can travel further (the minimum
 position can be negative).
 """
 
-direction_types = {'x+': [0,+1],'x-': [0,-1],'y+': [1,+1],'y-': [1,-1]}
+direction_types = {'x+': [0,+1],'x-': [0,-1],'y+': [1,+1],'y-': [1,-1],'z+': [2,+1],'z-': [2,-1]}
 
 
 class PrinterProbeMultiAxis:
@@ -38,11 +38,14 @@ class PrinterProbeMultiAxis:
 
         xconfig = config.getsection('stepper_x')
         yconfig = config.getsection('stepper_y')
+        zconfig = config.getsection('stepper_z')
         # Note: This may not work for all kinematics (delta)...
         self.axis_range = [ { -1: xconfig.getfloat('position_min', 0.),
                               +1: xconfig.getfloat('position_max')      },
                             { -1: yconfig.getfloat('position_min', 0.),
-                              +1: yconfig.getfloat('position_max')      } ]
+                              +1: yconfig.getfloat('position_max')      },
+                            { -1: zconfig.getfloat('position_min', 0.),
+                              +1: zconfig.getfloat('position_max')      } ]
 
         # Multi-sample support (for improved accuracy)
         self.sample_count = config.getint('samples', 1, minval=1)
@@ -103,7 +106,8 @@ class PrinterProbeMultiAxis:
         toolhead = self.printer.lookup_object('toolhead')
         curtime = self.printer.get_reactor().monotonic()
         if 'x' not in toolhead.get_status(curtime)['homed_axes'] or            \
-           'y' not in toolhead.get_status(curtime)['homed_axes']:
+           'y' not in toolhead.get_status(curtime)['homed_axes'] or
+           'z' not in toolhead.get_status(curtime)['homed_axes']:
             raise self.printer.command_error("Must home before probe")
         phoming = self.printer.lookup_object('homing')
         pos = toolhead.get_position()
@@ -300,6 +304,32 @@ class ProbeYEndstopWrapper:
     def get_position_endstop(self):
         return self.position_endstop
 
-
+# Endstop wrapper that enables probe specific features
+class ProbeZEndstopWrapper:
+    def __init__(self, config):
+        self.printer = config.get_printer()
+        # Create an "endstop" object to handle the probe pin
+        ppins = self.printer.lookup_object('pins')
+        pin = config.get('pin')
+        pin_params = ppins.lookup_pin(pin, can_invert=True, can_pullup=True)
+        mcu = pin_params['chip']
+        self.mcu_endstop = mcu.setup_pin('endstop', pin_params)
+        self.printer.register_event_handler('klippy:mcu_identify',
+                                            self._handle_mcu_identify)
+        # Wrappers
+        self.get_mcu = self.mcu_endstop.get_mcu
+        self.add_stepper = self.mcu_endstop.add_stepper
+        self.get_steppers = self.mcu_endstop.get_steppers
+        self.home_start = self.mcu_endstop.home_start
+        self.home_wait = self.mcu_endstop.home_wait
+        self.query_endstop = self.mcu_endstop.query_endstop
+    def _handle_mcu_identify(self):
+        kin = self.printer.lookup_object('toolhead').get_kinematics()
+        for stepper in kin.get_steppers():
+            if stepper.is_active_axis('z'):
+                self.add_stepper(stepper)
+    def get_position_endstop(self):
+        return self.position_endstop
+    
 def load_config(config):
-    return PrinterProbeMultiAxis(config, ProbeXEndstopWrapper(config), ProbeYEndstopWrapper(config))
+    return PrinterProbeMultiAxis(config, ProbeXEndstopWrapper(config), ProbeYEndstopWrapper(config), ProbeZEndstopWrapper(config))
