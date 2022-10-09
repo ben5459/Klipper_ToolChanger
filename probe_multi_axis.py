@@ -106,7 +106,7 @@ class PrinterProbeMultiAxis:
         toolhead = self.printer.lookup_object('toolhead')
         curtime = self.printer.get_reactor().monotonic()
         if 'x' not in toolhead.get_status(curtime)['homed_axes'] or            \
-           'y' not in toolhead.get_status(curtime)['homed_axes'] or
+           'y' not in toolhead.get_status(curtime)['homed_axes'] or            \
            'z' not in toolhead.get_status(curtime)['homed_axes']:
             raise self.printer.command_error("Must home before probe")
         phoming = self.printer.lookup_object('homing')
