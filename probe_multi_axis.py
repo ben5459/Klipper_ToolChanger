@@ -179,6 +179,9 @@ class PrinterProbeMultiAxis:
         pos = self.run_probe(gcmd)
         gcmd.respond_info("Result is x,y,z=%.6f,%.6f,%.6f" % (pos[0],pos[1],pos[2]))
         self.last_result = pos
+        self.last_x_result = pos[0]
+        self.last_y_result = pos[1]
+        self.last_z_result = pos[2]
         self._move(pos, self.get_lift_speed(gcmd))
     cmd_QUERY_PROBE_help = "Return the status of the xy-probe"
     def cmd_QUERY_PROBE(self, gcmd):
