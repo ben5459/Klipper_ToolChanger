@@ -504,7 +504,7 @@ class ATCSwitch:
     def get_status(self, eventtime=None):
         if self.last_state:
             return {'state': "PRESSED"}
-            return {'state': "RELEASED"}
+        return {'state': "RELEASED"}
 
     # Todo: 
     # Inspired by https://github.com/jschuh/klipper-macros/blob/main/layers.cfg
