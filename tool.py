@@ -521,4 +521,4 @@ class MeanLayerTime:
 
 
 def load_config_prefix(config):
-    return Tool(config, ATCSwitch(config))
+    return Tool(config), ATCSwitch(config)
