@@ -160,12 +160,19 @@ class PrinterProbeMultiAxis:
                                        self.samples_retries, minval=0)
         samples_result = gcmd.get("SAMPLES_RESULT", self.samples_result)
         
-        adjust_max = max(z_adjust)
-        if adjust_max > self.max_adjust:
-            raise self.gcode.error("Aborting quad_gantry_level"
-                                   " required adjustment %0.6f"
-                                   " is greater than max_adjust %0.6f"
-                                   % (adjust_max, self.max_adjust))
+        
+        travel_ave = sum(travel_dist) / len(travel_dist)
+        self.gcode.respond_info("Average: %0.6f" % z_ave)
+        travel_adjust = []
+        for travel in travel_dist:
+            travel_max.append(travel_ave - travel)
+        
+        travel_max = max(z_travel)
+        if travel_max > self.max_travel:
+            raise self.gcode.error("Aborting"
+                                   " required travel %0.6f"
+                                   " is greater than max_travel %0.6f"
+                                   % (travel_max, self.max_travel))
             
         probe_start = self.printer.lookup_object('toolhead').get_position()
         retries = 0
