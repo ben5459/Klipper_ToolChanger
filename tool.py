@@ -494,10 +494,10 @@ class ATCSwitch:
     def button_callback(self, eventtime, state):
         self.last_state = state
         template = self.press_template
-        if not state:
-            template = self.release_template
-        try:
-            self.gcode.run_script(template.render())
+#         if not state:
+#             template = self.release_template
+#         try:
+#             self.gcode.run_script(template.render())
 #         except:
 #             logging.exception("Script running error")
 
