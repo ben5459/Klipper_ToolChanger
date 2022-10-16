@@ -1,9 +1,13 @@
 #!/bin/bash
+KLIPPER_PATH="${HOME}/klipper"
+SYSTEMDDIR="/etc/systemd/system"
+
 # Constants
 EXTENSION_NAME="klipper_toolchanger"
 
 # Force script to exit if an error occurs
 set -e
+
 
 # Find SRCDIR from the pathname of this script
 SRCDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"
@@ -15,6 +19,16 @@ while getopts "k:" arg; do
         k) KLIPPER_PATH=$OPTARG;;
     esac
 done
+# Verify Klipper has been installed
+check_klipper()
+{
+    if [ "$(sudo systemctl list-units --full -all -t service --no-legend | grep -F "klipper.service")" ]; then
+        echo "Klipper service found!"
+    else
+        echo "Klipper service not found, please install Klipper first"
+        exit -1
+    fi
+}
 
 # Verify conditions for the install to take place
 check_preconditions()
@@ -46,7 +60,17 @@ restart_klipper()
     sudo systemctl restart klipper
 }
 
+# Helper functions
+verify_ready()
+{
+    if [ "$EUID" -eq 0 ]; then
+        echo "This script must not run as root"
+        exit -1
+    fi
+}
+
 # Installation steps:
 check_preconditions
+verify_ready
 link_extension
 restart_klipper
